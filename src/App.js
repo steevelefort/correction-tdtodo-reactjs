@@ -1,24 +1,54 @@
-import logo from './logo.svg';
 import './App.css';
+import { Fragment, useEffect, useState } from 'react';
+import '@fortawesome/fontawesome-free/css/all.css';
+import Form from './components/Form'
+import List from './components/List'
+import Footer from './components/Footer'
+import Header from 'components/Header';
 
 function App() {
+  
+
+  const [todos, setTodos] = useState([]);
+
+  useEffect( () => { 
+    const dataJSON = localStorage.getItem("todos") ;
+    const newTodos = JSON.parse(dataJSON || "[]");
+    setTodos(newTodos);
+  }, [] )
+
+  useEffect( () => { 
+    const dataJSON = JSON.stringify(todos)
+    localStorage.setItem('todos',dataJSON);
+  } )
+
+  const addTodo = (todo) => { 
+    const newTodos = [...todos];
+    const newTodo = { done: false, description: todo};
+    newTodos.push(newTodo);
+    setTodos(newTodos);
+  }
+
+  const removeTodo =(index)=>  {
+    const newTodos = [...todos];
+    newTodos.splice(index,1)
+    setTodos(newTodos);
+  }
+
+  const toggleTodo =(index)=>  {
+    const newTodos = [...todos];
+    newTodos[index].done = !newTodos[index].done;
+    setTodos(newTodos);
+  }
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Fragment>
+      <Header todos={todos}></Header>      
+      <main>
+        <Form addTodo={addTodo} />
+        <List todos={todos} toggleTodo={toggleTodo} removeTodo={removeTodo} setTodos={setTodos} />
+      </main>
+      <Footer />
+    </Fragment>
   );
 }
 
